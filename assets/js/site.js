@@ -166,17 +166,29 @@
        the instant after it starts. The observer fires in both cases, and the
        deadline lands the tween on its end state if frames never arrive. A
        visitor may miss the motion. They never miss the content. */
+    /* Start a block, and guarantee it lands.
+
+       IntersectionObserver callbacks are delivered on the rendering pipeline,
+       the same one that is throttled to nothing in an unfocused or background
+       tab. So the observer alone is not enough, and a deadline armed inside
+       its callback is worse than useless: when the callback never runs, the
+       failsafe never arms either. A timer backstop drives the same work
+       independently of rendering, because setTimeout keeps running. */
+    function startReveal(p) {
+      if (p.done) return;
+      if (p.tw.paused()) p.tw.play();
+      if (p.deadline) return;
+      p.deadline = window.setTimeout(function () {
+        if (p.tw.progress() < 1) p.tw.progress(1);
+        p.done = true;
+      }, 1200);
+    }
+
     var revealIO = ('IntersectionObserver' in window) ? new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
         if (!entry.isIntersecting) return;
-        var el = entry.target;
-        revealIO.unobserve(el);
-        var tw = el.__reveal;
-        if (!tw) return;
-        tw.play();
-        window.setTimeout(function () {
-          if (tw.progress() < 1) tw.progress(1);
-        }, 1200);
+        revealIO.unobserve(entry.target);
+        if (entry.target.__pending) startReveal(entry.target.__pending);
       });
       /* The root is stretched 14% past the fold so a block begins moving
          before it is scrolled to. Waiting until it is already on screen is
@@ -204,19 +216,43 @@
           { y: 0, opacity: 1, duration: 1, ease: 'power3.out', stagger: kids.length > 1 ? 0.07 : 0, paused: true });
       }
 
+      var record = { tw: tween, el: el, done: false, deadline: null };
       el.__reveal = tween;
-      pending.push({ tw: tween, el: el });
+      el.__pending = record;
+      pending.push(record);
       if (revealIO) revealIO.observe(el);
       else tween.progress(1);
     });
 
+    /* The backstop. Runs on a timer rather than on frames, so it works in a
+       tab that is not rendering. It stops itself once every block has landed,
+       and gives up after a minute so it cannot idle forever on a long page. */
+    var backstopRuns = 0;
+    var backstop = null;
     function sweepReveals() {
       var vh = window.innerHeight;
+      var remaining = 0;
       pending.forEach(function (p) {
+        if (p.tw.progress() >= 1) p.done = true;
+        if (p.done) return;
         var r = p.el.getBoundingClientRect();
-        if (r.top < vh * 1.15 && r.bottom > -80 && p.tw.progress() < 1) p.tw.progress(1);
+        if (r.top < vh * 1.15 && r.bottom > -80) startReveal(p);
+        remaining++;
       });
+      return remaining;
     }
+    function runBackstop() {
+      if (backstop) return;
+      backstopRuns = 0;
+      backstop = window.setInterval(function () {
+        backstopRuns++;
+        if (sweepReveals() === 0 || backstopRuns > 90) {
+          window.clearInterval(backstop);
+          backstop = null;
+        }
+      }, 650);
+    }
+    runBackstop();
 
     window.addEventListener('load', function () {
       ST.refresh();
@@ -227,8 +263,9 @@
       document.fonts.ready.then(function () { ST.refresh(); });
     }
     document.addEventListener('visibilitychange', function () {
-      if (!document.hidden) { ST.refresh(); sweepReveals(); }
+      if (!document.hidden) { ST.refresh(); runBackstop(); }
     });
+    window.addEventListener('scroll', runBackstop, { passive: true });
 
     /* Safety net. If anything ever makes the document scroller ambiguous
        again, ScrollTrigger stops updating silently and whole sections go
