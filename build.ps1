@@ -21,19 +21,30 @@ $year = (Get-Date).Year
 # returning visitor is never served yesterday's CSS out of their own cache.
 $stamp = Get-Date -Format 'yyyyMMddHHmmss'
 
+# The live origin. Change this one line when the real domain is pointed at the
+# site and every canonical tag, Open Graph URL and sitemap entry follows.
+$siteUrl = 'https://the-ikemco.vercel.app'
+
+# every page written, collected for the sitemap
+$script:builtPages = New-Object System.Collections.Generic.List[string]
+
 function Read-File($p) { Get-Content -Raw -Encoding UTF8 (Join-Path $root $p) }
 
 $layout = Read-File 'src/_layout.html'
 
 # $file is the output filename, $nav is the menu item that should read as current
 function Write-Page($file, $nav, $title, $desc, $content) {
+  $canonical = if ($file -eq 'index') { "$siteUrl/" } else { "$siteUrl/$file.html" }
   $html = $layout.Replace('{{TITLE}}', $title).
                   Replace('{{DESC}}', $desc).
                   Replace('{{SLUG}}', $nav).
                   Replace('{{YEAR}}', "$year").
                   Replace('{{V}}', $stamp).
+                  Replace('{{SITE}}', $siteUrl).
+                  Replace('{{CANONICAL}}', $canonical).
                   Replace('{{CONTENT}}', $content)
   Set-Content -Path (Join-Path $root "$file.html") -Value $html -Encoding UTF8
+  $script:builtPages.Add($canonical)
   Write-Host "  $file.html"
 }
 
@@ -380,6 +391,22 @@ $jTitle = ([regex]::Match($journalRaw, '<!--@title\s*(.*?)-->')).Groups[1].Value
 $jDesc = ([regex]::Match($journalRaw, '<!--@desc\s*(.*?)-->')).Groups[1].Value.Trim()
 $jBody = [regex]::Replace($journalRaw, '<!--@\w+\s*.*?-->\r?\n?', '')
 Write-Page 'journal' 'journal' $jTitle $jDesc $jBody
+
+# --- sitemap -----------------------------------------------------------------
+# Written for launch day. It has no effect while robots.txt carries Disallow.
+$today = Get-Date -Format 'yyyy-MM-dd'
+$urls = ($script:builtPages | Sort-Object -Unique | ForEach-Object {
+  "  <url><loc>$_</loc><lastmod>$today</lastmod></url>"
+}) -join "`n"
+$sitemap = @"
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+$urls
+</urlset>
+"@
+Set-Content -Path (Join-Path $root 'sitemap.xml') -Value $sitemap -Encoding UTF8
+Write-Host ''
+Write-Host ("Sitemap: " + $script:builtPages.Count + " urls at " + $siteUrl)
 
 Write-Host ''
 Write-Host 'Done.'

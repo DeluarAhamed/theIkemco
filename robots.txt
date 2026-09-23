@@ -9,3 +9,5 @@
 #
 User-agent: *
 Disallow: /
+
+Sitemap: https://the-ikemco.vercel.app/sitemap.xml

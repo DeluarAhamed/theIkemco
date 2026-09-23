@@ -1,9 +1,53 @@
 # THE IKEM CO.
 
-A 21 page custom static site. No framework, no CMS theme, no page builder.
+**Live: https://the-ikemco.vercel.app**
+**Repo: https://github.com/DeluarAhamed/theIkemco**
+
+A 26 page custom static site. No framework, no CMS theme, no page builder.
 Plain HTML, one stylesheet, two small scripts. Deploys anywhere.
 
-## Run it
+## Deploying
+
+Vercel is connected to the `main` branch of the GitHub repo. Any push to
+`main` redeploys automatically. There is no build step on Vercel: the
+repository holds the finished HTML, so it is served as is.
+
+```bash
+powershell -NoProfile -ExecutionPolicy Bypass -File build.ps1
+git add -A
+git commit -m "your message"
+git push
+```
+
+`vercel.json` sets immutable caching on `/assets` and no-cache on the HTML, so
+the versioned CSS and JS are served fast while page changes appear at once.
+
+### Pointing a real domain at it
+
+In the Vercel project, open Settings, then Domains, and add the domain. Vercel
+prints the DNS records to set at your registrar. Then change one line at the
+top of `build.ps1`:
+
+```powershell
+$siteUrl = 'https://theikemco.com'
+```
+
+and run the build. Every canonical tag, Open Graph URL and sitemap entry
+follows from that single constant. Update the `Sitemap:` line in `robots.txt`
+to match.
+
+### Search engines are currently blocked
+
+`robots.txt` carries `Disallow: /` and every page carries
+`<meta name="robots" content="noindex, nofollow">`, because the listings,
+testimonials and press links are still placeholder content. The site is fully
+live and shareable; it is simply not indexed.
+
+To open it up: replace the placeholder content listed further down, change
+`robots.txt` to `Allow: /`, delete the robots meta line from
+`src/_layout.html`, rebuild and push.
+
+## Run it locally
 
 Open `index.html` in a browser, or serve the folder:
 
