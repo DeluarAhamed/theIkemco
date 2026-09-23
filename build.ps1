@@ -43,6 +43,13 @@ function Write-Page($file, $nav, $title, $desc, $content) {
                   Replace('{{SITE}}', $siteUrl).
                   Replace('{{CANONICAL}}', $canonical).
                   Replace('{{CONTENT}}', $content)
+
+  # Stamp relative image URLs too. Photography keeps its filename when it is
+  # replaced, and a browser that once cached a 404 for a slot will keep
+  # serving that 404 and never see the photograph that arrived later.
+  # Absolute URLs (og:image) are left alone so shared links stay stable.
+  $html = [regex]::Replace($html, '(?<=["''])assets/img/[^"'']+?\.(?:jpg|jpeg|png|svg|webp)', { param($m) $m.Value + '?v=' + $stamp })
+
   Set-Content -Path (Join-Path $root "$file.html") -Value $html -Encoding UTF8
   $script:builtPages.Add($canonical)
   Write-Host "  $file.html"

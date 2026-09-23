@@ -245,7 +245,8 @@
       var place = function () {
         if (img.naturalWidth > 0) return;
         if (frame.querySelector('canvas')) return;
-        var src = img.getAttribute('src') || 'ikem';
+        /* strip the cache stamp so a slot's drawing stays identical build to build */
+        var src = (img.getAttribute('src') || 'ikem').split('?')[0];
         var architectural = /(property-|hood-)/.test(src);
         var c = document.createElement('canvas');
         c.setAttribute('data-ridge', src);
