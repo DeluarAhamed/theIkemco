@@ -1,0 +1,15 @@
+# Local tooling, not part of the site
+.preview/
+.claude/
+
+# OS and editor noise
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+*.swp
+.idea/
+.vscode/
+
+# Nothing here is built by a package manager, but just in case
+node_modules/

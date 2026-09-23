@@ -1,0 +1,69 @@
+<section class="page-intro">
+  <canvas class="page-intro-canvas" data-ridge="{{SLUG}}" data-ridge-tone="light" data-ridge-lines="18"></canvas>
+  <div class="wrap">
+    <p class="crumb"><a href="services.html">Services</a><span>/</span><span>{{NAME}}</span></p>
+    <div class="intro-grid">
+      <div>
+        <h1 data-reveal="mask"><span>{{NAME}}</span></h1>
+      </div>
+      <p class="lede">{{LEDE}}</p>
+    </div>
+  </div>
+</section>
+
+<section class="bleed">
+  <div class="bleed-layer" data-parallax>
+    <canvas data-ridge="{{SLUG}}-bleed" data-ridge-tone="dark" data-ridge-lines="24"></canvas>
+    <img src="assets/img/service-{{SLUG}}.jpg" alt="{{NAME}}" onerror="this.classList.add('missing')">
+    <video class="bleed-video" autoplay muted loop playsinline preload="none" poster="assets/img/service-{{SLUG}}.jpg">
+      <source src="assets/video/service-{{SLUG}}.mp4" type="video/mp4">
+    </video>
+  </div>
+  <div class="bleed-scrim"></div>
+  <span class="bleed-slug">Section video / service-{{SLUG}}.mp4</span>
+  <div class="wrap bleed-in">
+    <p class="pull">{{LEDE}}</p>
+  </div>
+</section>
+
+<section class="wrap band">
+  <div class="split is-top">
+    <div class="chapter">
+      <span class="n">{{N}}</span>
+      <p class="eyebrow" style="margin-top:1rem">How it works</p>
+    </div>
+    <div class="measure" data-reveal>
+      <p>{{BODY1}}</p>
+      <p>{{BODY2}}</p>
+    </div>
+  </div>
+</section>
+
+<section class="band-chalk">
+  <div class="wrap band-tight">
+    <p class="eyebrow" data-reveal>What you get</p>
+    <div class="index-list" data-reveal>
+{{POINTS}}
+    </div>
+  </div>
+</section>
+
+<section class="band-forest">
+  <div class="wrap band-tight">
+    <div class="section-head">
+      <h2>The rest of the practice.</h2>
+      <a class="link on-dark" href="services.html"><span>All services</span><span class="arrow">&rarr;</span></a>
+    </div>
+    <div class="index-list">
+{{OTHERS}}
+    </div>
+  </div>
+</section>
+
+<section class="cta-band">
+  <canvas data-ridge="cta-{{SLUG}}" data-ridge-tone="dark" data-ridge-lines="16"></canvas>
+  <div class="wrap cta-in">
+    <h2>Tell me what you are trying to do.</h2>
+    <a class="btn btn-light" href="contact.html"><span>Start a Conversation</span></a>
+  </div>
+</section>

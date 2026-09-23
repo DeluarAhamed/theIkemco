@@ -1,0 +1,37 @@
+DROP YOUR VIDEO IN THIS FOLDER, USING THESE EXACT FILENAMES.
+Any file that is missing falls back to the animated contour graphic, so the
+section still looks finished. Nothing breaks while you are still shooting.
+
+BACKGROUND LOOPS
+  Silent, no audio track at all. 8 to 15 seconds, looping cleanly.
+  1920 wide is plenty. H.264 MP4, target 3 to 6 MB each.
+  These autoplay muted, so keep them calm. Slow drift, no cuts.
+
+  hero.mp4                          Home hero
+  terrace.mp4                       Home, quote break
+  about.mp4                         About, full bleed break
+  approach.mp4                      The Approach, full bleed break
+  services.mp4                      Services, full bleed break
+  corridor.mp4                      Neighborhoods, full bleed break
+  contact.mp4                       Contact, full bleed break
+  menu-loop.mp4                     Inside the full screen menu
+  service-sports-entertainment.mp4  Sports and Entertainment page
+  service-commercial.mp4            Commercial page
+  service-property-management.mp4   Property Management page
+  service-construction-advisory.mp4 Construction Advisory page
+
+CLIENT FILMS
+  These play with sound in the theater overlay when a card is clicked.
+  Full audio, 16 by 9, 1080p. Their poster frames are the client-0X.jpg files.
+
+  testimonial-01.mp4
+  testimonial-02.mp4
+  testimonial-03.mp4
+  testimonial-04.mp4
+  testimonial-05.mp4
+  testimonial-06.mp4
+
+HOSTING THE FILMS ELSEWHERE
+  If the client films are on Vimeo or a streaming host, open assets/js/site.js,
+  find the data-film block, and replace the video string with your embed iframe.
+  The card markup does not change.

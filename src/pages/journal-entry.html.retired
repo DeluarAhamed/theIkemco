@@ -1,0 +1,78 @@
+<!--@title Buying Without Your Name-->
+<!--@desc Trusts, entities and the practical limits of privacy in a public records state.-->
+<!--@nav journal-->
+
+<section class="page-intro">
+  <canvas class="page-intro-canvas" data-ridge="entry" data-ridge-tone="light" data-ridge-lines="12"></canvas>
+  <div class="wrap-narrow">
+    <p class="crumb"><a href="journal.html">Journal</a><span>/</span><span>Privacy</span></p>
+    <h1 style="max-width:20ch" data-reveal="mask"><span>Buying a home without your name on anything</span></h1>
+    <p class="fine" style="margin-top:2rem">Privacy &middot; 5 min read &middot; By Ikem</p>
+  </div>
+</section>
+
+<section class="wrap">
+  <div class="frame ratio-21x9 is-dark" data-slug="Article hero" data-reveal="media">
+    <canvas data-ridge="entry-hero" data-ridge-tone="dark" data-ridge-lines="26"></canvas>
+    <img src="assets/img/journal-03.jpg" alt="" onerror="this.classList.add('missing')">
+  </div>
+</section>
+
+<article class="band">
+  <div class="article">
+    <p>Almost every client I work with asks a version of the same question in the first meeting. Some ask it directly. Most circle it for twenty minutes and then say something like, will anyone be able to find out.</p>
+    <p>The honest answer is that California is a public records state, and the deed is a public record. What you can control is what that record says, who it points to, and how much work it takes to connect it back to you. That is not nothing. In practice it is most of what people actually want.</p>
+
+    <h2>What a trust does and does not do</h2>
+    <p>Holding title in a trust is the most common approach, and the most commonly misunderstood. A revocable trust named after you offers no privacy at all. A trust named after the street, a family word, or nothing in particular offers a great deal, because the public record shows the trust name and the trustee, and a well structured arrangement puts your attorney or a corporate trustee in that seat.</p>
+    <p>This has to be set up before the offer goes out. Amending title after the fact creates a second public record that points directly at the first one, which is the opposite of the goal.</p>
+
+    <blockquote>The mistake is almost never the structure. It is the timing.</blockquote>
+
+    <h2>Entities, and when they are worth it</h2>
+    <p>A limited liability company can hold residential property, and for clients who already have one for other reasons it is sometimes the cleaner answer. It comes with costs: annual filings, franchise tax, lender resistance, and in some cases a loss of the homeowner exemption. For an income property that math usually works. For a primary residence it often does not.</p>
+    <p>I will walk through this with your attorney and your business manager rather than making the call for you. My job is to make sure the decision is made before we are in escrow, not during.</p>
+
+    <h2>The part nobody talks about</h2>
+    <p>Structure protects the record. It does not protect against people. The listing agent knows. The photographer knows. The inspector, the appraiser, the contractor and the neighbor who watched the tour all know something. This is where an off market transaction earns its keep, and where the choice of who represents you matters more than any document.</p>
+    <p>When I say many of my transactions never reach the open market, this is a large part of why.</p>
+
+    <h2>What I would do</h2>
+    <p>Set up the entity or trust early, with your attorney, before we write anything. Keep the buying party small. Choose a representation approach that limits how many people have to be told. And accept that perfect invisibility is not available, so aim instead for a record that takes serious effort to unwind and a process that gives almost nobody a reason to try.</p>
+    <span class="signature">Ikem</span>
+  </div>
+</article>
+
+<section class="band-chalk">
+  <div class="wrap band-tight">
+    <div class="section-head">
+      <h2>Keep reading.</h2>
+      <a class="link" href="journal.html"><span>All entries</span><span class="arrow">&rarr;</span></a>
+    </div>
+    <div class="grid-journal" data-reveal>
+      <a class="entry" href="journal-entry.html">
+        <div class="entry-media"><div class="frame ratio-3x2" data-slug="Journal 01"><img src="assets/img/journal-01.jpg" alt="" onerror="this.classList.add('missing')"></div></div>
+        <p class="fine">Ownership &middot; 6 min read</p>
+        <h3>What a business manager should ask before you write an offer</h3>
+      </a>
+      <a class="entry" href="journal-entry.html">
+        <div class="entry-media"><div class="frame ratio-3x2 is-dark" data-slug="Journal 02"><img src="assets/img/journal-02.jpg" alt="" onerror="this.classList.add('missing')"></div></div>
+        <p class="fine">Neighborhoods &middot; 8 min read</p>
+        <h3>Why View Park holds value when the rest of the map moves</h3>
+      </a>
+      <a class="entry" href="journal-entry.html">
+        <div class="entry-media"><div class="frame ratio-3x2 is-clay" data-slug="Journal 05"><img src="assets/img/journal-05.jpg" alt="" onerror="this.classList.add('missing')"></div></div>
+        <p class="fine">Market &middot; 4 min read</p>
+        <h3>Off market does not mean off limits</h3>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="cta-band">
+  <canvas data-ridge="cta-entry" data-ridge-tone="dark" data-ridge-lines="16"></canvas>
+  <div class="wrap cta-in">
+    <h2>Want this handled properly on your next purchase.</h2>
+    <a class="btn btn-light" href="contact.html"><span>Start a Conversation</span></a>
+  </div>
+</section>

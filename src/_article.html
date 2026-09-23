@@ -1,0 +1,60 @@
+<section class="page-intro">
+  <canvas class="page-intro-canvas" data-ridge="{{SLUG}}" data-ridge-tone="light" data-ridge-lines="12"></canvas>
+  <div class="wrap-narrow">
+    <p class="crumb"><a href="journal.html">Journal</a><span>/</span><span>{{CATEGORY}}</span></p>
+    <h1 data-reveal="mask"><span>{{TITLE}}</span></h1>
+    <p class="lede" style="max-width:52ch;margin-top:1.75rem">{{DEK}}</p>
+    <p class="fine" style="margin-top:2rem">{{CATEGORY}} &middot; {{READ}} min read &middot; By Ikem</p>
+  </div>
+</section>
+
+<section class="wrap">
+  <div class="frame ratio-21x9{{TONE}}" data-slug="{{TITLE}}" data-reveal="media">
+    <img src="assets/img/{{IMAGE}}" alt="" onerror="this.classList.add('missing')">
+  </div>
+</section>
+
+<article class="band">
+  <div class="article">
+{{BODY}}
+    <span class="signature">Ikem</span>
+  </div>
+</article>
+
+<section class="band-chalk">
+  <div class="wrap band-tight">
+    <div class="split is-top">
+      <div>
+        <p class="eyebrow">The Private List</p>
+        <h2 style="max-width:14ch">More of this, sent rarely.</h2>
+      </div>
+      <div>
+        <p class="lede" style="max-width:40ch">Off market opportunities, quiet price movement and the occasional thought worth your time. Your name is never shared with anyone.</p>
+        <form class="field-row" data-form="list" novalidate style="margin-top:2rem">
+          <label class="label" for="listEmail" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Email address</label>
+          <input class="input" id="listEmail" name="email" type="email" placeholder="Email address" required>
+          <button class="btn btn-solid" type="submit"><span>Request access</span></button>
+          <span class="form-status" data-status role="status"></span>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="wrap band-tight">
+  <div class="section-head">
+    <h2>Keep reading.</h2>
+    <a class="link" href="journal.html"><span>All entries</span><span class="arrow">&rarr;</span></a>
+  </div>
+  <div class="grid-journal">
+{{RELATED}}
+  </div>
+</section>
+
+<section class="cta-band">
+  <canvas data-ridge="cta-{{SLUG}}" data-ridge-tone="dark" data-ridge-lines="16"></canvas>
+  <div class="wrap cta-in">
+    <h2>Want this handled properly on your next transaction.</h2>
+    <a class="btn btn-light" href="contact.html"><span>Start a Conversation</span></a>
+  </div>
+</section>

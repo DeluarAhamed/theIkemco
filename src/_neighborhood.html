@@ -1,0 +1,90 @@
+<section class="page-intro">
+  <canvas class="page-intro-canvas" data-ridge="{{SLUG}}" data-ridge-tone="light" data-ridge-lines="20"></canvas>
+  <div class="wrap">
+    <p class="crumb"><a href="neighborhoods.html">Neighborhoods</a><span>/</span><span>{{NAME}}</span></p>
+    <div class="intro-grid">
+      <div>
+        <h1 data-reveal="mask"><span>{{NAME}}</span></h1>
+      </div>
+      <p class="lede">{{LEDE}}</p>
+    </div>
+  </div>
+</section>
+
+<section class="wrap">
+  <div class="frame ratio-21x9{{TONE}}" data-slug="{{NAME}} / hero" data-reveal="media">
+    <canvas data-ridge="{{SLUG}}-hero" data-ridge-tone="{{RIDGETONE}}" data-ridge-lines="26"></canvas>
+    <img src="assets/img/hood-{{SLUG}}.jpg" alt="{{NAME}}" onerror="this.classList.add('missing')">
+  </div>
+</section>
+
+<section class="wrap band">
+  <div class="split is-top">
+    <div class="chapter">
+      <span class="n">{{N}}</span>
+      <p class="eyebrow" style="margin-top:1rem">The read</p>
+    </div>
+    <div class="measure" data-reveal>
+      <p>{{BODY1}}</p>
+      <p>{{BODY2}}</p>
+      <p class="fine" style="margin-top:2rem">What I watch for</p>
+      <p class="pull" style="margin-top:0.75rem;font-size:1.35rem;max-width:34ch">{{WATCH}}</p>
+    </div>
+  </div>
+</section>
+
+<section class="band-chalk">
+  <div class="wrap band-tight">
+    <p class="eyebrow" data-reveal>Market snapshot</p>
+    <div class="snapshot" data-reveal>
+      <div><span class="val count-up" data-count="{{MEDIANNUM}}" data-dec="{{MEDIANDEC}}" data-prefix="$" data-suffix="{{MEDIANUNIT}}">{{MEDIAN}}</span><span class="fine">Median sale</span></div>
+      <div><span class="val count-up" data-count="{{DOM}}">{{DOM}}</span><span class="fine">Days on market</span></div>
+      <div><span class="val count-up" data-count="{{ASKNUM}}" data-suffix="%">{{ASK}}</span><span class="fine">Of asking</span></div>
+      <div><span class="val count-up" data-count="{{N}}">{{N}}</span><span class="fine">Of five areas covered</span></div>
+    </div>
+    <p class="fine" style="margin-top:1.25rem">Figures are placeholders pending the live data feed.</p>
+
+    <h2 style="margin-top:clamp(3rem,6vw,4.5rem);max-width:16ch" data-reveal>Recent work in {{NAME}}.</h2>
+    <ul class="sales-list" style="margin-top:2rem" data-reveal>
+{{SALES}}
+    </ul>
+  </div>
+</section>
+
+<section class="band-forest">
+  <div class="wrap band-tight">
+    <div class="split is-top">
+      <div>
+        <p class="eyebrow on-dark">Area report</p>
+        <h2 style="max-width:14ch">Get the {{NAME}} report.</h2>
+      </div>
+      <div data-reveal>
+        <p class="lede" style="max-width:40ch">Current inventory, what has traded in the last ninety days, what is moving quietly, and an honest read on where the value sits right now.</p>
+        <form class="field-row" data-form="report" novalidate style="margin-top:2rem">
+          <label class="label" for="reportEmail" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Email address</label>
+          <input class="input" id="reportEmail" name="email" type="email" placeholder="Email address" required>
+          <button class="btn btn-light" type="submit"><span>Send it to me</span></button>
+          <span class="form-status" data-status role="status"></span>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="wrap band-tight">
+  <div class="section-head">
+    <h2>The other four.</h2>
+    <a class="link" href="neighborhoods.html"><span>All neighborhoods</span><span class="arrow">&rarr;</span></a>
+  </div>
+  <div class="rail" data-reveal>
+{{OTHERS}}
+  </div>
+</section>
+
+<section class="cta-band">
+  <canvas data-ridge="cta-{{SLUG}}" data-ridge-tone="dark" data-ridge-lines="18"></canvas>
+  <div class="wrap cta-in">
+    <h2>Thinking about {{NAME}}. Let us talk about it properly.</h2>
+    <a class="btn btn-light" href="contact.html"><span>Start a Conversation</span></a>
+  </div>
+</section>

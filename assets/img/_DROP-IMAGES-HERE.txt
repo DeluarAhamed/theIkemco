@@ -1,0 +1,64 @@
+DROP YOUR IMAGES IN THIS FOLDER, USING THESE EXACT FILENAMES.
+Any file that is missing falls back to a contour frame, so the site never breaks.
+JPEG or WebP, roughly 2000px on the long edge, quality 70 to 80.
+
+YOU
+  ikem-hero.jpg              Home hero. Full length, room to breathe above the head.
+  ikem-dining.jpg            Home, The practice. Seated at the dining table.
+  ikem-agave.jpg             Home, quote break. Terrace or agave shot, golden hour.
+  ikem-window.jpg            About, opening portrait. Standing beside the glass door.
+  ikem-stairs.jpg            About, full bleed break. Exterior stairs at dusk.
+  ikem-terrace.jpg           Approach and Contact breaks. Terrace, table set.
+  ikem-headshot-01.jpg       About and Press contact sheet. Crop to 3 by 4.
+  ikem-headshot-02.jpg
+  ikem-headshot-03.jpg
+  ikem-headshot-04.jpg
+  menu-poster.jpg            Poster frame behind the video in the full screen menu.
+
+CLIENTS  (the real client photos, used as film poster frames)
+  client-01.jpg              3 by 4 crop. Pairs with testimonial-01.mp4
+  client-02.jpg
+  client-03.jpg
+  client-04.jpg
+  client-05.jpg
+  client-06.jpg
+
+PROPERTIES
+  property-01.jpg            Home featured and Properties grid
+  property-02.jpg
+  property-03.jpg
+  property-04.jpg
+  property-05.jpg
+  property-06.jpg
+  property-07.jpg
+  property-08.jpg
+
+NEIGHBOURHOODS  (street level and architectural, not aerial)
+  hood-ladera-heights.jpg
+  hood-view-park.jpg
+  hood-windsor-hills.jpg
+  hood-baldwin-hills.jpg
+  hood-leimert-park.jpg
+  corridor.jpg               Neighborhoods page break. The ridge, wide.
+
+SERVICES  (atmospheric, not literal)
+  service-residential.jpg
+  service-sports-entertainment.jpg
+  service-commercial.jpg
+  service-property-management.jpg
+  service-construction-advisory.jpg
+
+JOURNAL
+  journal-01.jpg
+  journal-02.jpg
+  journal-03.jpg
+  journal-04.jpg
+  journal-05.jpg
+  journal-06.jpg
+
+PRESS LOGOS  (optional, in the press subfolder, SVG preferred)
+  press/hollywood-reporter.svg
+  press/variety.svg
+  press/robb-report.svg
+  press/la-times.svg
+  press/inman.svg
