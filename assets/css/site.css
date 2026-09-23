@@ -624,7 +624,7 @@ html:not(.js) .curtain { display: none; }
   line-height: 1;
 }
 .seal-mark { font-family: var(--display); font-size: 1.05rem; letter-spacing: 0.14em; }
-.seal-sub { font-family: var(--micro); font-size: 0.5rem; letter-spacing: 0.24em; text-transform: uppercase; }
+.seal-sub { font-family: var(--micro); font-size: 0.5625rem; letter-spacing: 0.24em; text-transform: uppercase; }
 .seal-lg { padding: 1.4rem 1.7rem; color: rgba(233, 229, 219, 0.5); }
 .seal-lg .seal-mark { font-size: 1.6rem; }
 
@@ -1299,8 +1299,44 @@ html.js.gsap-on [data-reveal="mask"] > * { transform: none; }
 }
 
 @media (max-width: 400px) {
-  .hero .btn { font-size: 0.625rem; letter-spacing: 0.14em; padding: 0.95rem 0.75rem; }
+  .hero .btn { font-size: 0.6875rem; letter-spacing: 0.16em; padding: 1rem 0.75rem; }
   .hero-media > img, .hero-media > video { object-position: 74% 52%; }
+}
+
+/* --- Touch targets -------------------------------------------------------
+   A phone has no pointer and no hover, so anything tappable needs a target a
+   thumb can actually hit. Where padding would move the design, the hit area
+   is expanded with a pseudo element instead, so nothing shifts visually. */
+
+@media (max-width: 900px) {
+  .menu-btn { min-height: 44px; }
+  .menu-btn-label { font-size: 0.6875rem; }
+  .filter { min-height: 44px; padding-block: 0.75rem; }
+  .crumb { font-size: 0.6875rem; }
+  .save { width: 2.75rem; height: 2.75rem; }
+  .footer ul { gap: 1.1rem; }
+  .footer h4 { font-size: 0.6875rem; }
+
+  .link, .crumb a, .footer ul a { position: relative; }
+  .link::after,
+  .crumb a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 44px;
+  }
+  .footer ul a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 40px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
