@@ -370,20 +370,113 @@
     });
   }
 
-  /* ---------- draggable rails ------------------------------------------- */
+  /* ---------- rail slider ------------------------------------------------
+     Arrows and a progress rule replace the native scrollbar, GSAP eases every
+     move, and the click that follows a drag is swallowed so sliding the rail
+     never navigates to a card by accident. */
   $$('.rail').forEach(function (rail) {
-    var down = false, startX = 0, startLeft = 0;
+    var controls = document.createElement('div');
+    controls.className = 'rail-controls';
+    controls.innerHTML =
+      '<div class="rail-progress"><span></span></div>' +
+      '<div class="rail-arrows">' +
+        '<button class="rail-btn" type="button" data-dir="-1" aria-label="Previous">' +
+          '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 2 4 8l6 6"/></svg></button>' +
+        '<button class="rail-btn" type="button" data-dir="1" aria-label="Next">' +
+          '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 2l6 6-6 6"/></svg></button>' +
+      '</div>';
+    rail.insertAdjacentElement('afterend', controls);
+
+    var bar = controls.querySelector('.rail-progress span');
+    var prev = controls.querySelector('[data-dir="-1"]');
+    var next = controls.querySelector('[data-dir="1"]');
+
+    function maxScroll() { return rail.scrollWidth - rail.clientWidth; }
+
+    function step() {
+      var card = rail.firstElementChild;
+      if (!card) return rail.clientWidth * 0.8;
+      var gap = parseFloat(window.getComputedStyle(rail).columnGap) || 0;
+      return card.getBoundingClientRect().width + gap;
+    }
+
+    function paint() {
+      var max = maxScroll();
+      controls.hidden = max < 4;
+      bar.style.width = max > 0 ? Math.min(100, (rail.scrollLeft / max) * 100) + '%' : '0%';
+      prev.disabled = rail.scrollLeft < 4;
+      next.disabled = rail.scrollLeft > max - 4;
+    }
+
+    /* GSAP cannot tween scrollLeft on an element without ScrollToPlugin, so
+       a proxy number is tweened and written across on each frame. The timer
+       lands it anyway if frames never arrive, as in a background tab. */
+    var proxy = { v: 0 };
+    function slideTo(x) {
+      var target = Math.max(0, Math.min(maxScroll(), x));
+      if (reduce || !gsap) { rail.scrollLeft = target; paint(); return; }
+      gsap.killTweensOf(proxy);
+      proxy.v = rail.scrollLeft;
+      rail.classList.add("is-sliding");
+      var tw = gsap.to(proxy, {
+        v: target,
+        duration: 0.8,
+        ease: "power3.out",
+        onUpdate: function () { rail.scrollLeft = proxy.v; paint(); },
+        onComplete: function () { rail.classList.remove("is-sliding"); paint(); }
+      });
+      window.setTimeout(function () {
+        if (tw.progress() < 1) tw.progress(1);
+        rail.classList.remove("is-sliding");
+        paint();
+      }, 1100);
+    }
+
+    controls.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-dir]');
+      if (!b || b.disabled) return;
+      slideTo(rail.scrollLeft + step() * parseInt(b.getAttribute('data-dir'), 10));
+    });
+
+    var down = false, moved = 0, startX = 0, startLeft = 0;
+
+    function swallow(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      rail.removeEventListener('click', swallow, true);
+    }
+
     rail.addEventListener('pointerdown', function (e) {
       if (e.pointerType === 'touch') return;
-      down = true; startX = e.clientX; startLeft = rail.scrollLeft;
+      down = true; moved = 0; startX = e.clientX; startLeft = rail.scrollLeft;
       rail.classList.add('is-dragging');
+      if (gsap) gsap.killTweensOf(proxy);
     });
-    window.addEventListener('pointerup', function () { down = false; rail.classList.remove('is-dragging'); });
+
     rail.addEventListener('pointermove', function (e) {
       if (!down) return;
       e.preventDefault();
+      moved = Math.abs(e.clientX - startX);
       rail.scrollLeft = startLeft - (e.clientX - startX);
     });
+
+    window.addEventListener('pointerup', function () {
+      if (!down) return;
+      down = false;
+      rail.classList.remove('is-dragging');
+      if (moved > 6) {
+        rail.addEventListener('click', swallow, true);
+        var s = step();
+        slideTo(Math.round(rail.scrollLeft / s) * s);
+      }
+      paint();
+    });
+
+    rail.addEventListener('scroll', paint, { passive: true });
+    window.addEventListener('resize', paint);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(paint);
+    window.setTimeout(paint, 300);
+    paint();
   });
 
   /* ---------- property filter ------------------------------------------- */
