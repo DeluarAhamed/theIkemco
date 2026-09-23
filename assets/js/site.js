@@ -136,7 +136,7 @@
     root.classList.add('gsap-on');
 
     /* the opening. One orchestrated sequence rather than scattered effects. */
-    var opener = gsap.timeline({ delay: 0.5 });
+    var opener = gsap.timeline({ delay: 0.15 });
     var heroBits = $$('.hero .eyebrow, .hero h1, .hero .lede, .hero .hero-cta, .hero .scroll-cue');
     if (heroBits.length) {
       gsap.set(heroBits, { y: 26, opacity: 0 });
@@ -176,9 +176,12 @@
         tw.play();
         window.setTimeout(function () {
           if (tw.progress() < 1) tw.progress(1);
-        }, 1800);
+        }, 1200);
       });
-    }, { rootMargin: '0px 0px -6% 0px', threshold: 0.01 }) : null;
+      /* The root is stretched 14% past the fold so a block begins moving
+         before it is scrolled to. Waiting until it is already on screen is
+         what reads as content arriving late, or not at all on a fast scroll. */
+    }, { rootMargin: '0px 0px 14% 0px', threshold: 0.01 }) : null;
 
     $$('[data-reveal]').forEach(function (el) {
       var kind = el.getAttribute('data-reveal');
