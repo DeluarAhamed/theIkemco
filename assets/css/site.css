@@ -690,7 +690,7 @@ html:not(.js) .curtain { display: none; }
 .hero h1 {
   color: var(--chalk);
   max-width: 15ch;
-  font-size: clamp(2.1rem, min(6.2vw, 7.9vh), 5.25rem);
+  font-size: clamp(2.1rem, min(6.4vw, 13vh), 5.5rem);
   line-height: 1.04;
 }
 .hero h1 em { display: block; color: #d9d2c4; }
@@ -1270,15 +1270,14 @@ html.js.gsap-on [data-reveal="mask"] > * { transform: none; }
    the hero against the height it actually has.                          */
 
 @media (max-height: 820px) {
-  .hero-in { padding-block: clamp(4.75rem, 9.5vh, 6.25rem) clamp(1.25rem, 3.4vh, 2.25rem); }
+  .hero-in { padding-block: clamp(5rem, 10vh, 6.5rem) clamp(1.5rem, 3.6vh, 2.5rem); }
   .hero-foot { margin-top: clamp(1rem, 2.8vh, 1.75rem); padding-top: clamp(0.9rem, 2vh, 1.4rem); }
-  .hero-foot .lede { max-width: 40ch; }
   .hero .btn { padding: 0.9rem 1.5rem; }
   .page-intro { padding-block: clamp(6rem, 11vh, 8rem) clamp(1.5rem, 4vh, 3rem); }
   .scroll-cue { bottom: 1.5rem; }
 }
 
-@media (max-height: 620px) {
+@media (max-height: 620px) and (max-width: 900px) {
   /* landscape phones and short windows: let the hero take the height it needs
      rather than forcing a viewport it cannot fill legibly */
   .hero { min-height: 0; }
