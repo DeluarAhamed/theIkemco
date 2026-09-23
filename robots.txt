@@ -1,0 +1,11 @@
+# The site is live but deliberately not indexed while the listings,
+# testimonials and press links are still placeholder content.
+#
+# TO GO FULLY PUBLIC:
+#   1. replace the placeholder content listed in README.md
+#   2. change the two lines below to:  Allow: /
+#   3. remove the robots meta tag from src/_layout.html
+#   4. run build.ps1 and push
+#
+User-agent: *
+Disallow: /
