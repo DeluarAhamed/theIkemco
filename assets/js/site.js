@@ -354,8 +354,15 @@
     };
     $$('[data-peek]').forEach(function (row) {
       row.addEventListener('mouseenter', function () {
-        peek.innerHTML = '<div class="frame" data-slug="' + (row.getAttribute('data-peek-slug') || '') + '" style="width:100%;height:100%">' +
+        var src = (row.getAttribute('data-peek') || '').split('?')[0];
+        peek.innerHTML = '<div class="frame is-dark" style="width:100%;height:100%">' +
+          '<canvas data-ridge="' + src + '" data-ridge-tone="dark"></canvas>' +
           '<img src="' + row.getAttribute('data-peek') + '" alt="" onerror="this.style.display=\'none\'"></div>';
+        var c = peek.querySelector('canvas');
+        if (c && window.Ridge) {
+          c.setAttribute('data-ridge-mode', window.Ridge.modeFor(src));
+          window.Ridge.build(c);
+        }
         peek.classList.add('is-on');
       });
       row.addEventListener('mouseleave', function () { peek.classList.remove('is-on'); });

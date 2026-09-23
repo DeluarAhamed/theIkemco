@@ -1,18 +1,24 @@
 /* =========================================================================
-   Ridge — a custom canvas graphic for The Ikem Co.
-   Draws layered contour lines of a hillside. Every canvas takes a seed, so
-   each neighborhood and each section gets its own ridge that is reproducible
-   and belongs only to this site. Doubles as the fallback behind any section
-   whose background video has not been supplied yet.
+   Ridge — the custom drawing engine for The Ikem Co.
 
-   <canvas data-ridge="view-park" data-ridge-tone="light|dark" data-ridge-lines="14"></canvas>
+   Three modes, all generated from a text seed so a given slot always draws
+   the same thing, and no two slots draw the same thing.
+
+     contour    layered topographic lines. The house style, used for ambience
+                behind dark sections and wherever a slot is simply waiting.
+     terrain    a layered ridge landscape with atmospheric depth. Used for
+                neighbourhood slots.
+     elevation  an architectural elevation: volumes, glazing, a cantilever,
+                horizon and ground shadow. Used for property slots.
+
+   <canvas data-ridge="view-park" data-ridge-mode="terrain"
+           data-ridge-tone="light|dark" data-ridge-lines="14"></canvas>
    ========================================================================= */
 (function () {
   'use strict';
 
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  /* deterministic pseudo random from a string seed */
   function seedFrom(str) {
     var h = 1779033703 ^ str.length;
     for (var i = 0; i < str.length; i++) {
@@ -27,7 +33,6 @@
     };
   }
 
-  /* one octave of smooth value noise over a fixed lattice */
   function makeNoise(rand, points) {
     var table = [];
     for (var i = 0; i <= points; i++) table.push(rand());
@@ -44,36 +49,21 @@
   function build(canvas) {
     var seed = canvas.getAttribute('data-ridge') || 'ikem';
     var tone = canvas.getAttribute('data-ridge-tone') || 'dark';
-    var mode = canvas.getAttribute('data-ridge-mode') || 'ridge';
+    var mode = canvas.getAttribute('data-ridge-mode') || 'contour';
     var lines = parseInt(canvas.getAttribute('data-ridge-lines'), 10) || 16;
-    if (mode === 'plan') lines = 7;
     var rand = seedFrom(seed);
 
-    /* an abstract elevation, drawn once from the same seed. Used wherever a
-       photograph has not arrived yet, so a property card reads as an
-       architect's drawing rather than an empty box. */
-    var plan = null;
-    function makePlan() {
-      var volumes = [];
-      var count = 2 + Math.floor(rand() * 3);
-      var x = 0.06 + rand() * 0.06;
-      for (var i = 0; i < count; i++) {
-        var w = 0.16 + rand() * 0.24;
-        if (x + w > 0.94) { w = Math.max(0.1, 0.94 - x); }
-        var h = 0.16 + rand() * 0.34;
-        volumes.push({
-          x: x, w: w, h: h,
-          cols: 2 + Math.floor(rand() * 4),
-          rows: 1 + Math.floor(rand() * 3),
-          glass: rand() > 0.32,
-          cantilever: rand() > 0.62 ? 0.05 + rand() * 0.06 : 0
-        });
-        x += w + (rand() * 0.035);
-        if (x > 0.9) break;
-      }
-      return { volumes: volumes, ground: 0.76 + rand() * 0.08, datum: 0.2 + rand() * 0.12 };
+    var ctx = canvas.getContext('2d');
+    var w = 0, h = 0, dpr = 1, t = 0;
+    var running = false, raf = null, last = 0;
+
+    function ink(a) {
+      return tone === 'light'
+        ? 'rgba(51, 48, 42,' + a.toFixed(3) + ')'
+        : 'rgba(233, 229, 219,' + a.toFixed(3) + ')';
     }
 
+    /* ---- contour ------------------------------------------------------ */
     var layers = [];
     for (var i = 0; i < lines; i++) {
       layers.push({
@@ -86,13 +76,172 @@
       });
     }
 
-    var ctx = canvas.getContext('2d');
-    var w = 0, h = 0, dpr = 1;
-    var t = 0;
-    var running = false;
-    var raf = null;
-    var last = 0;
+    function drawContour(alphaScale) {
+      var step = Math.max(4, Math.round(w / 220));
+      for (var i = 0; i < layers.length; i++) {
+        var L = layers[i];
+        var fade = 1 - i / (layers.length * 1.25);
+        ctx.beginPath();
+        for (var x = 0; x <= w + step; x += step) {
+          var u = x / w;
+          var n = L.a(u + t * L.drift) * 0.55 + L.b(u * 1.7 + t * L.drift * 1.7) * 0.32 + L.c(u * 3.1) * 0.13;
+          var y = h * (L.base - L.amp * (n - 0.5) * 2);
+          if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = ink(((tone === 'light' ? 0.22 : 0.34) * fade + 0.05) * alphaScale);
+        ctx.stroke();
+      }
+    }
 
+    /* ---- terrain ------------------------------------------------------ */
+    var ridges = null;
+    function makeRidges() {
+      var out = [];
+      for (var i = 0; i < 6; i++) {
+        out.push({
+          a: makeNoise(rand, 3 + i),
+          b: makeNoise(rand, 7 + i * 2),
+          base: 0.40 + i * 0.095,
+          amp: 0.115 - i * 0.013
+        });
+      }
+      return out;
+    }
+
+    function drawTerrain() {
+      if (!ridges) ridges = makeRidges();
+
+      /* sky, a whisper of tone so the horizon has somewhere to sit */
+      var sky = ctx.createLinearGradient(0, 0, 0, h * 0.62);
+      sky.addColorStop(0, ink(0.10));
+      sky.addColorStop(1, ink(0));
+      ctx.fillStyle = sky;
+      ctx.fillRect(0, 0, w, h * 0.62);
+
+      var step = Math.max(3, Math.round(w / 260));
+      for (var i = 0; i < ridges.length; i++) {
+        var R = ridges[i];
+        ctx.beginPath();
+        ctx.moveTo(0, h);
+        for (var x = 0; x <= w + step; x += step) {
+          var u = x / w;
+          var n = R.a(u) * 0.62 + R.b(u * 1.9) * 0.38;
+          var y = h * (R.base - R.amp * (n - 0.5) * 2);
+          x === 0 ? ctx.lineTo(x, y) : ctx.lineTo(x, y);
+        }
+        ctx.lineTo(w, h);
+        ctx.closePath();
+        /* nearer ridges sit heavier, which is what reads as distance */
+        ctx.fillStyle = ink(0.045 + i * 0.032);
+        ctx.fill();
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = ink(0.10 + i * 0.03);
+        ctx.stroke();
+      }
+    }
+
+    /* ---- elevation ---------------------------------------------------- */
+    var plan = null;
+    function makePlan() {
+      var vols = [];
+      var count = 2 + Math.floor(rand() * 3);
+      var x = 0.08 + rand() * 0.07;
+      for (var i = 0; i < count; i++) {
+        var vw = 0.15 + rand() * 0.22;
+        if (x + vw > 0.93) vw = Math.max(0.1, 0.93 - x);
+        vols.push({
+          x: x, w: vw,
+          h: 0.16 + rand() * 0.32,
+          cols: 2 + Math.floor(rand() * 4),
+          rows: 1 + Math.floor(rand() * 3),
+          glazed: rand() > 0.28,
+          lit: rand(),
+          cantilever: rand() > 0.55 ? 0.035 + rand() * 0.05 : 0
+        });
+        x += vw + 0.012 + rand() * 0.03;
+        if (x > 0.9) break;
+      }
+      return { vols: vols, ground: 0.76 + rand() * 0.06, mast: 0.2 + rand() * 0.6 };
+    }
+
+    function drawElevation() {
+      if (!plan) plan = makePlan();
+      var g = h * plan.ground;
+
+      var sky = ctx.createLinearGradient(0, 0, 0, g);
+      sky.addColorStop(0, ink(0.11));
+      sky.addColorStop(1, ink(0.01));
+      ctx.fillStyle = sky;
+      ctx.fillRect(0, 0, w, g);
+
+      ctx.fillStyle = ink(0.07);
+      ctx.fillRect(0, g, w, h - g);
+
+      plan.vols.forEach(function (v) {
+        var x0 = w * v.x, vw = w * v.w, vh = h * v.h, y0 = g - vh;
+
+        if (v.cantilever) {
+          ctx.fillStyle = ink(0.13);
+          ctx.fillRect(x0 - w * v.cantilever, y0 - h * 0.012, vw + w * v.cantilever * 2, h * 0.012);
+        }
+
+        ctx.fillStyle = ink(0.10 + v.lit * 0.07);
+        ctx.fillRect(x0, y0, vw, vh);
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = ink(0.34);
+        ctx.strokeRect(x0, y0, vw, vh);
+
+        if (v.glazed) {
+          var cw = vw / v.cols, rh = vh / v.rows;
+          for (var c = 0; c < v.cols; c++) {
+            for (var r = 0; r < v.rows; r++) {
+              /* a few panels catch the light, the rest stay quiet */
+              if (((c * 7 + r * 13 + Math.floor(v.lit * 100)) % 5) === 0) {
+                ctx.fillStyle = ink(0.16);
+                ctx.fillRect(x0 + cw * c, y0 + rh * r, cw, rh);
+              }
+            }
+          }
+          ctx.strokeStyle = ink(0.15);
+          for (var cc = 1; cc < v.cols; cc++) {
+            ctx.beginPath();
+            ctx.moveTo(x0 + cw * cc, y0);
+            ctx.lineTo(x0 + cw * cc, g);
+            ctx.stroke();
+          }
+          for (var rr = 1; rr < v.rows; rr++) {
+            ctx.beginPath();
+            ctx.moveTo(x0, y0 + rh * rr);
+            ctx.lineTo(x0 + vw, y0 + rh * rr);
+            ctx.stroke();
+          }
+        }
+
+        /* the shadow the volume throws along the ground plane */
+        var sh = ctx.createLinearGradient(0, g, 0, g + h * 0.06);
+        sh.addColorStop(0, ink(0.16));
+        sh.addColorStop(1, ink(0));
+        ctx.fillStyle = sh;
+        ctx.fillRect(x0, g, vw, h * 0.06);
+      });
+
+      /* a single vertical, the way an elevation drawing carries a tree or mast */
+      var mx = w * plan.mast;
+      ctx.strokeStyle = ink(0.22);
+      ctx.beginPath();
+      ctx.moveTo(mx, g);
+      ctx.lineTo(mx, g - h * 0.30);
+      ctx.stroke();
+
+      ctx.strokeStyle = ink(0.42);
+      ctx.beginPath();
+      ctx.moveTo(0, g);
+      ctx.lineTo(w, g);
+      ctx.stroke();
+    }
+
+    /* ---- plumbing ----------------------------------------------------- */
     function size() {
       var r = canvas.getBoundingClientRect();
       dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -103,112 +252,21 @@
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
 
-    function ink(alpha) {
-      return tone === 'light'
-        ? 'rgba(51, 48, 42,' + alpha.toFixed(3) + ')'
-        : 'rgba(233, 229, 219,' + alpha.toFixed(3) + ')';
-    }
-
-    function drawPlan() {
-      if (!plan) plan = makePlan();
-      var g = h * plan.ground;
-
-      /* two datum rules, the way an elevation drawing carries them */
-      ctx.lineWidth = 1;
-      ctx.strokeStyle = ink(0.1);
-      [plan.datum, plan.datum + 0.1].forEach(function (d) {
-        ctx.beginPath();
-        ctx.moveTo(0, h * d);
-        ctx.lineTo(w, h * d);
-        ctx.stroke();
-      });
-
-      plan.volumes.forEach(function (v) {
-        var x0 = w * v.x, vw = w * v.w, vh = h * v.h, y0 = g - vh;
-
-        if (v.cantilever) {
-          ctx.strokeStyle = ink(0.24);
-          ctx.beginPath();
-          ctx.moveTo(x0 - w * v.cantilever, y0);
-          ctx.lineTo(x0 + vw + w * v.cantilever, y0);
-          ctx.stroke();
-        }
-
-        ctx.strokeStyle = ink(0.34);
-        ctx.strokeRect(x0, y0, vw, vh);
-
-        if (v.glass) {
-          ctx.strokeStyle = ink(0.16);
-          for (var c = 1; c < v.cols; c++) {
-            ctx.beginPath();
-            ctx.moveTo(x0 + (vw / v.cols) * c, y0);
-            ctx.lineTo(x0 + (vw / v.cols) * c, g);
-            ctx.stroke();
-          }
-          for (var r = 1; r < v.rows; r++) {
-            ctx.beginPath();
-            ctx.moveTo(x0, y0 + (vh / v.rows) * r);
-            ctx.lineTo(x0 + vw, y0 + (vh / v.rows) * r);
-            ctx.stroke();
-          }
-        }
-      });
-
-      /* ground, then the piers below it */
-      ctx.strokeStyle = ink(0.4);
-      ctx.beginPath();
-      ctx.moveTo(0, g);
-      ctx.lineTo(w, g);
-      ctx.stroke();
-
-      ctx.strokeStyle = ink(0.18);
-      for (var p = 0; p < 9; p++) {
-        var px = w * (0.08 + p * 0.1);
-        ctx.beginPath();
-        ctx.moveTo(px, g);
-        ctx.lineTo(px, g + h * 0.05);
-        ctx.stroke();
-      }
-    }
-
     function draw() {
       ctx.clearRect(0, 0, w, h);
-      var step = Math.max(4, Math.round(w / 220));
-
-      for (var i = 0; i < layers.length; i++) {
-        var L = layers[i];
-        var fade = 1 - i / (layers.length * 1.25);
-        ctx.beginPath();
-        for (var x = 0; x <= w + step; x += step) {
-          var u = x / w;
-          var n = L.a(u + t * L.drift) * 0.55 + L.b(u * 1.7 + t * L.drift * 1.7) * 0.32 + L.c(u * 3.1) * 0.13;
-          var y = h * (L.base - L.amp * (n - 0.5) * 2);
-          if (x === 0) ctx.moveTo(x, y);
-          else ctx.lineTo(x, y);
-        }
-        ctx.lineWidth = 1;
-        ctx.strokeStyle = mode === 'plan'
-          ? ink(0.07 * fade + 0.02)
-          : ink(tone === 'light' ? 0.22 * fade + 0.04 : 0.34 * fade + 0.06);
-        ctx.stroke();
-      }
-
-      if (mode === 'plan') drawPlan();
+      if (mode === 'terrain') { drawTerrain(); drawContour(0.35); return; }
+      if (mode === 'elevation') { drawContour(0.25); drawElevation(); return; }
+      drawContour(1);
     }
 
     function frame(now) {
       raf = null;
       if (!running) return;
-      if (now - last > 40) {          /* hold near 25fps, this is ambient */
-        last = now;
-        t += 0.06;
-        draw();
-      }
+      if (now - last > 40) { last = now; t += 0.06; draw(); }
       raf = window.requestAnimationFrame(frame);
     }
-
     function start() {
-      if (running || reduce || mode === 'plan') return;   /* a drawing does not drift */
+      if (running || reduce || mode !== 'contour') return;  /* a drawing does not drift */
       running = true;
       raf = window.requestAnimationFrame(frame);
     }
@@ -222,9 +280,7 @@
     draw();
 
     if ('IntersectionObserver' in window) {
-      new IntersectionObserver(function (entries) {
-        entries[0].isIntersecting ? start() : stop();
-      }, { rootMargin: '120px' }).observe(canvas);
+      new IntersectionObserver(function (e) { e[0].isIntersecting ? start() : stop(); }, { rootMargin: '120px' }).observe(canvas);
     } else {
       start();
     }
@@ -234,10 +290,14 @@
 
   var instances = [];
 
-  /* Any frame whose photograph has not been supplied yet draws its own.
-     Property and neighbourhood slots get an abstract elevation, everything
-     else gets contours. Seeded from the file path, so a given slot always
-     looks the same, and the drawing disappears the moment a real image lands. */
+  /* Which drawing belongs in a slot, decided by the file it is standing in for. */
+  function modeFor(src) {
+    if (/property-|listing-/.test(src)) return 'elevation';
+    if (/hood-|corridor|neighbou?rhood/.test(src)) return 'terrain';
+    if (/service-|peek-/.test(src)) return 'elevation';
+    return 'contour';
+  }
+
   function fillEmptyFrames() {
     Array.prototype.forEach.call(document.querySelectorAll('.frame > img'), function (img) {
       var frame = img.parentElement;
@@ -245,21 +305,20 @@
       var place = function () {
         if (img.naturalWidth > 0) return;
         if (frame.querySelector('canvas')) return;
-        /* strip the cache stamp so a slot's drawing stays identical build to build */
         var src = (img.getAttribute('src') || 'ikem').split('?')[0];
-        var architectural = /(property-|hood-)/.test(src);
         var c = document.createElement('canvas');
         c.setAttribute('data-ridge', src);
-        c.setAttribute('data-ridge-mode', architectural ? 'plan' : 'ridge');
+        c.setAttribute('data-ridge-mode', modeFor(src));
         c.setAttribute('data-ridge-tone',
           (frame.classList.contains('is-dark') || frame.classList.contains('is-clay')) ? 'dark' : 'light');
-        c.setAttribute('data-ridge-lines', architectural ? '7' : '14');
+        c.setAttribute('data-ridge-lines', '14');
         frame.insertBefore(c, frame.firstChild);
         instances.push(build(c));
       };
 
-      if (img.complete) place();
-      else img.addEventListener('error', place);
+      /* a lazy image reports complete before it has been asked to load */
+      if (img.complete && img.naturalWidth === 0) place();
+      img.addEventListener('error', place);
     });
   }
 
@@ -268,7 +327,7 @@
     fillEmptyFrames();
   }
 
-  window.Ridge = { build: build, fillEmptyFrames: fillEmptyFrames };
+  window.Ridge = { build: build, modeFor: modeFor, fillEmptyFrames: fillEmptyFrames };
 
   var resizeTimer = null;
   window.addEventListener('resize', function () {
