@@ -50,6 +50,10 @@ function Write-Page($file, $nav, $title, $desc, $content) {
   # Absolute URLs (og:image) are left alone so shared links stay stable.
   $html = [regex]::Replace($html, '(?<=["''])assets/img/[^"'']+?\.(?:jpg|jpeg|png|svg|webp)', { param($m) $m.Value + '?v=' + $stamp })
 
+  # Defer every photograph except the one in the hero, which is the first thing
+  # a visitor sees and must not wait its turn.
+  $html = [regex]::Replace($html, '<img (?![^>]*data-eager)(?![^>]*loading=)', '<img loading="lazy" decoding="async" ')
+
   Set-Content -Path (Join-Path $root "$file.html") -Value $html -Encoding UTF8
   $script:builtPages.Add($canonical)
   Write-Host "  $file.html"

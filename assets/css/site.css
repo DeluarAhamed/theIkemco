@@ -286,7 +286,11 @@ a { color: inherit; }
   z-index: 4;
   pointer-events: none;
 }
-.frame::after {
+/* The contact sheet frame slugs were scaffolding for the build, naming which
+   photograph belonged in each slot. They are off now that the site is live.
+   Set the flag on <html> to bring them back while art directing. */
+.frame::after { content: none; }
+html.show-slugs .frame::after {
   content: attr(data-slug);
   position: absolute;
   left: 1.5rem;
@@ -362,7 +366,9 @@ a { color: inherit; }
 }
 .bleed-in { position: relative; z-index: 2; padding-block: clamp(3.5rem, 8vw, 7rem); width: 100%; }
 .bleed h2, .bleed h1, .bleed .pull { color: var(--chalk); }
-.bleed-slug {
+.bleed-slug { display: none; }
+html.show-slugs .bleed-slug {
+  display: block;
   position: absolute;
   right: var(--gutter);
   top: 1.75rem;
@@ -1099,6 +1105,25 @@ html:not(.js) .curtain { display: none; }
 .cta-band canvas { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0.35; }
 .cta-in { position: relative; z-index: 1; display: flex; flex-wrap: wrap; gap: 2.5rem; justify-content: space-between; align-items: center; padding-block: clamp(3.5rem, 8vw, 6.5rem); }
 .cta-in h2 { max-width: 15ch; color: var(--chalk); }
+/* The CTA band is dark but is not .band-forest, so its supporting text was
+   inheriting the light ground colours and landing dark on dark. */
+.cta-band .lede,
+.cta-band p,
+.cta-band .fine { color: var(--on-forest-soft); }
+
+/* a disclosure that has to be read, not skimmed past */
+.notice {
+  font-family: var(--micro);
+  font-size: 0.75rem;
+  line-height: 1.7;
+  letter-spacing: 0.04em;
+  color: var(--ink-soft);
+  border-left: 2px solid var(--clay);
+  padding: 0.35rem 0 0.35rem 1.1rem;
+  max-width: 62ch;
+  margin: 0;
+}
+.band-forest .notice { color: var(--on-forest-soft); }
 
 /* ---------- 11 Footer and overlays --------------------------------------- */
 
